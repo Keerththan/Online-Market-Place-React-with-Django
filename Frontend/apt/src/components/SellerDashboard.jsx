@@ -7,7 +7,7 @@ const SellerDashboard = () => {
   const [products, setProducts] = useState([]);
   const [sellerDetails, setSellerDetails] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editProduct, setEditProduct] = useState(null); // Store the product being edited
+  const [editProduct, setEditProduct] = useState(null);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -50,45 +50,69 @@ const SellerDashboard = () => {
   };
 
   const handleEditProduct = (product) => {
-    setEditProduct(product); // Store product to be edited
+    setEditProduct(product);
     setIsModalOpen(true);
   };
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
-      <div className="w-1/4 bg-gray-800 text-white p-4">
-        <div className="text-2xl font-bold">📌 Sidebar</div>
+      <div className="w-1/4 bg-gray-800 text-white p-6 flex flex-col">
+        <h2 className="text-3xl font-bold text-center text-blue-500">Seller Panel</h2>
         <ul className="mt-6 space-y-4">
-          <li><a href="#dashboard" className="block py-2 px-4 hover:bg-gray-700">Dashboard</a></li>
-          <li><a href="#products" className="block py-2 px-4 hover:bg-gray-700">Products</a></li>
-          <li><button onClick={() => navigate("/login")} className="block py-2 px-4 hover:bg-gray-700 w-full">Logout</button></li>
+          <li>
+            <button className="w-full text-left px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-md transition">
+              📦 Products
+            </button>
+          </li>
+          <li>
+            <button className="w-full text-left px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-md transition">
+              📑 Orders
+            </button>
+          </li>
+          <li>
+            <button onClick={() => navigate("/login")} className="w-full px-4 py-2 bg-red-500 hover:bg-red-400 rounded-md transition">
+              🚪 Logout
+            </button>
+          </li>
         </ul>
       </div>
 
       {/* Main Content */}
-      <div className="w-3/4 p-6">
-        <div className="mb-6">
-          <h2 className="text-3xl font-semibold text-black">📋 Products</h2>
-          <button onClick={() => { setEditProduct(null); setIsModalOpen(true); }} className="mt-4 py-2 px-6 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+      <div className="w-3/4 p-8">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-3xl font-semibold text-gray-800">📋 Products</h2>
+          <button 
+            onClick={() => { setEditProduct(null); setIsModalOpen(true); }} 
+            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
             ➕ Add Product
           </button>
+        </div>
 
-          <div className="space-y-4 mt-4">
-            {products.length > 0 ? (
-              products.map((product) => (
-                <div key={product.id} className="flex justify-between items-center p-4 border border-gray-300 rounded-md">
-                  <div>{product.product_name}</div>
-                  <div className="space-x-4">
-                    <button onClick={() => handleEditProduct(product)} className="text-yellow-500 hover:underline">✏️ Edit</button>
-                    <button onClick={() => handleDeleteProduct(product.id)} className="text-red-500 hover:underline">🗑️ Delete</button>
-                  </div>
+        {/* Product Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {products.length > 0 ? (
+            products.map((product) => (
+              <div key={product.id} className="bg-white shadow-lg rounded-lg p-6 border border-gray-300 hover:shadow-xl transition duration-300">
+                <h3 className="text-lg font-semibold text-gray-900">{product.product_name}</h3>
+                <p className="text-gray-600 text-sm">${product.product_price}</p>
+                <div className="flex justify-between mt-4">
+                  <button 
+                    onClick={() => handleEditProduct(product)} 
+                    className="text-yellow-500 hover:text-yellow-600 transition">
+                    ✏️ Edit
+                  </button>
+                  <button 
+                    onClick={() => handleDeleteProduct(product.id)} 
+                    className="text-red-500 hover:text-red-600 transition">
+                    🗑️ Delete
+                  </button>
                 </div>
-              ))
-            ) : (
-              <p>No products available</p>
-            )}
-          </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-600">No products available</p>
+          )}
         </div>
       </div>
 
@@ -99,7 +123,7 @@ const SellerDashboard = () => {
           onClose={() => setIsModalOpen(false)} 
           onProductAddedOrUpdated={handleProductAddedOrUpdated} 
           sellerId={sellerDetails.id}
-          editProduct={editProduct} // Pass the product to edit
+          editProduct={editProduct}
         />
       )}
     </div>
@@ -108,8 +132,9 @@ const SellerDashboard = () => {
 
 export default SellerDashboard;
 
+
 /**
- * AddProductModal Component - Modal to Add/Edit Product
+ * AddProductModal Component - Modernized Modal UI
  */
 const AddProductModal = ({ isOpen, onClose, onProductAddedOrUpdated, sellerId, editProduct }) => {
   const [productData, setProductData] = useState({
@@ -154,12 +179,10 @@ const AddProductModal = ({ isOpen, onClose, onProductAddedOrUpdated, sellerId, e
 
     try {
       if (editProduct) {
-        // Update existing product
         await axios.patch(`http://127.0.0.1:8000/inventory/products/${editProduct.id}/`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
       } else {
-        // Add new product
         await axios.post("http://127.0.0.1:8000/inventory/products/", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
@@ -174,19 +197,66 @@ const AddProductModal = ({ isOpen, onClose, onProductAddedOrUpdated, sellerId, e
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-        <h2 className="text-2xl font-semibold text-center mb-4">{editProduct ? "Edit Product" : "Add Product"}</h2>
-
+      <div className="bg-white p-8 rounded-lg shadow-lg w-96">
+        <h2 className="text-2xl font-semibold text-center mb-4">{editProduct ? "Update Product" : "Add Product"}</h2>
         <form onSubmit={handleSubmit}>
-          <input type="text" name="product_name" value={productData.product_name} placeholder="Product Name" className="w-full mb-2 p-2 border" onChange={handleChange} required />
-          <input type="number" name="product_net_weight" value={productData.product_net_weight} placeholder="Net Weight (grams)" className="w-full mb-2 p-2 border" onChange={handleChange} required />
-          <input type="text" name="product_category" value={productData.product_category} placeholder="Category" className="w-full mb-2 p-2 border" onChange={handleChange} required />
-          <input type="number" name="product_price" value={productData.product_price} placeholder="Price ($)" className="w-full mb-2 p-2 border" onChange={handleChange} required />
-          <input type="file" name="product_image" className="w-full mb-2 p-2 border" onChange={handleImageChange} />
+          <input 
+            type="text" 
+            name="product_name" 
+            value={productData.product_name} 
+            placeholder="Product Name" 
+            className="w-full mb-4 p-3 border border-gray-300 rounded-md" 
+            onChange={handleChange} 
+            required 
+          />
+          <input 
+            type="number" 
+            name="product_net_weight" 
+            value={productData.product_net_weight} 
+            placeholder="Net Weight (grams)" 
+            className="w-full mb-4 p-3 border border-gray-300 rounded-md" 
+            onChange={handleChange} 
+            required 
+          />
+          <input 
+            type="text" 
+            name="product_category" 
+            value={productData.product_category} 
+            placeholder="Category" 
+            className="w-full mb-4 p-3 border border-gray-300 rounded-md" 
+            onChange={handleChange} 
+            required 
+          />
+          <input 
+            type="number" 
+            name="product_price" 
+            value={productData.product_price} 
+            placeholder="Price ($)" 
+            className="w-full mb-4 p-3 border border-gray-300 rounded-md" 
+            onChange={handleChange} 
+            required 
+          />
+          <input 
+            type="file" 
+            name="product_image" 
+            className="w-full mb-4 p-3 border border-gray-300 rounded-md" 
+            onChange={handleImageChange} 
+          />
 
           <div className="flex justify-between mt-4">
-            <button type="button" className="px-4 py-2 bg-gray-400 text-white rounded-md" onClick={onClose}>Cancel</button>
-            <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">{editProduct ? "Update Product" : "Add Product"}</button>
+            <button 
+              type="button" 
+              className="px-4 py-2 bg-gray-400 text-white rounded-md hover:bg-gray-500" 
+              onClick={onClose}
+            >
+              Cancel
+            </button>
+            <button 
+              type="submit" 
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+            >
+              {editProduct ? "Update Product" : "Add Product"}
+            </button>
           </div>
         </form>
       </div>
