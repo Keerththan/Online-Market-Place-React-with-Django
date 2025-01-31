@@ -38,7 +38,7 @@ const ProductDetailPage = () => {
         <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
           <div className="flex items-center space-x-8">
             <img
-              src={product.product_image}
+              src={`http://127.0.0.1:8000/inventory${product.product_image}`}
               alt={product.product_name}
               className="w-64 h-64 object-cover rounded-md"
             />

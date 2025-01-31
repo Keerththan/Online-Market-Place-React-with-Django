@@ -7,18 +7,24 @@ import ProductDetailPage from "./components/ProductDetailPage";
 
 import "./App.css";
 import SellerDashboard from "./components/SellerDashboard";
+import Header from "./components/Header.jsx";
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/" element={<HomePage />} />
-        <Route path="/sellerDash" element={<SellerDashboard />} />
-        <Route path="/product/:id" element={<ProductDetailPage />} /> {/* Product Detail Route */}
-      </Routes>
-    </Router>
+    <>
+      
+      <Router>
+      <Header />
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/sellerDash" element={<SellerDashboard />} />
+          <Route path="/product/:id" element={<ProductDetailPage />} />{" "}
+          {/* Product Detail Route */}
+        </Routes>
+      </Router>
+    </>
   );
 }
 
