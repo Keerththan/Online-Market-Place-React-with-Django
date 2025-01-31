@@ -3,9 +3,10 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./components/HomePage.jsx";
 import LoginPage from "./components/LoginPage.jsx";
 import RegisterPage from "./components/RegisterPage.jsx";
+import ProductDetailPage from "./components/ProductDetailPage";
 
 import "./App.css";
-import SellerDashboard from "./components/SellerDashBoard.jsx";
+import SellerDashboard from "./components/SellerDashboard";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/" element={<HomePage />} />
         <Route path="/sellerDash" element={<SellerDashboard />} />
+        <Route path="/product/:id" element={<ProductDetailPage />} /> {/* Product Detail Route */}
       </Routes>
     </Router>
   );
