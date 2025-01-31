@@ -2,11 +2,14 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate
-from .models import User, Products
+from .models import User, Products, Order
 from .serializers import RegisterSerializer, LoginSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
-
+from django.http import JsonResponse
+import json
+from django.views.decorators.csrf import csrf_exempt
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class ProductsView(APIView):
@@ -63,7 +66,6 @@ class ProductsViewById(APIView):
         try:
             product = Products.objects.get(id=id)
 
-            # Update fields if provided in the request
             product.product_image = request.FILES.get("product_image", product.product_image)
             product.product_name = request.data.get("product_name", product.product_name)
             product.product_net_weight = request.data.get("product_net_weight", product.product_net_weight)
@@ -123,7 +125,7 @@ class LoginView(APIView):
 
 class UserDetailsByEmailView(APIView):
     def post(self, request):
-        email = request.data.get("email")  # Extract email from JSON request body
+        email = request.data.get("email")
 
         if not email:
             return Response({"error": "Email is required"}, status=status.HTTP_400_BAD_REQUEST)
@@ -148,7 +150,6 @@ class UserDetailsByEmailView(APIView):
 class GetProductsBySellerId(APIView):
     def get(self, request, seller_id):
         try:
-            # Fetch products for the given seller_id
             products = Products.objects.filter(seller_id=seller_id)
             products_data = []
 
@@ -167,3 +168,66 @@ class GetProductsBySellerId(APIView):
 
         except Products.DoesNotExist:
             return Response({"error": "No products found for this seller"}, status=status.HTTP_404_NOT_FOUND)
+
+@csrf_exempt
+def create_order(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+
+        buyer_id = data.get('buyer_id')
+        product_id = data.get('product_id')
+        quantity = data.get('quantity', 1)
+        price = data.get('price')
+        address = data.get('address')
+        mobile_number = data.get('mobile_number')
+        payment_method = data.get('payment_method')
+
+        try:
+            buyer = User.objects.get(id=buyer_id)
+            product = Products.objects.get(id=product_id)
+        except (User.DoesNotExist, Products.DoesNotExist):
+            return JsonResponse({'error': 'Buyer or Product not found'}, status=400)
+
+        order = Order.objects.create(
+            buyer_id=buyer_id,
+            product_id=product_id,
+            quantity=quantity,
+            price=price,
+            address=address,
+            mobile_number=mobile_number,
+            payment_method=payment_method
+        )
+
+        return JsonResponse({'message': 'Order placed successfully', 'order_id': order.id}, status=201)
+
+    return JsonResponse({'error': 'Invalid method'}, status=405)
+
+
+def get_orders_by_seller(request, seller_id):
+    if request.method == 'GET':
+        try:
+            products = Products.objects.filter(seller_id=seller_id)
+            product_ids = products.values_list('id', flat=True)
+
+            orders = Order.objects.filter(product_id__in=product_ids)
+
+            order_list = []
+            for order in orders:
+                order_list.append({
+                    'order_id': order.id,
+                    'buyer_id': order.buyer_id,
+                    'product_id': order.product_id,
+                    'quantity': order.quantity,
+                    'price': order.price,
+                    'address': order.address,
+                    'mobile_number': order.mobile_number,
+                    'payment_method': order.payment_method,
+                    'order_date': order.order_date.strftime('%Y-%m-%d %H:%M:%S'),
+                })
+
+            return JsonResponse({'orders': order_list}, status=200)
+
+        except ObjectDoesNotExist:
+            return JsonResponse({'error': 'No orders found for this seller'}, status=404)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
