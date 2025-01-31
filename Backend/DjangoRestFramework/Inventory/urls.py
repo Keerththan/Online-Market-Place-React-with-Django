@@ -9,6 +9,7 @@ urlpatterns = [
     path('products/<int:id>/', ProductsViewById.as_view()),
     path('register/', RegisterView.as_view(), name='register'),
     path('login/', LoginView.as_view(), name='login'),
+    path('products/seller/<int:seller_id>/', GetProductsBySellerId.as_view(), name='get-products-by-seller'),
     path('user/details/', views.UserDetailsByEmailView.as_view(), name='user-details-by-email')
     
     # other URLs...
