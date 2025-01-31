@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import axios from "axios";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const RegisterPage = () => {
   const [email, setEmail] = useState("");
@@ -32,19 +32,16 @@ const RegisterPage = () => {
     // Send registration data to backend
     axios
       .post("http://127.0.0.1:8000/inventory/register/", {
-         "username": username,  
-        "email": email,
-        "password": password,
-        "user_type": userType, 
-        "address": address,
-        "contact_number": contactNumber, 
-        "district": district, 
+        username,
+        email,
+        password,
+        user_type: userType,
+        address,
+        contact_number: contactNumber,
+        district,
       })
       .then((response) => {
-        // Show success message
         setSuccessMessage("Registration successful! Redirecting to login...");
-
-        // Redirect user to login page after 2 seconds
         setTimeout(() => {
           navigate("/login");
         }, 2000);
@@ -56,9 +53,9 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <div className="bg-gray-300 p-8 rounded-lg shadow-lg w-96">
-        <h2 className="text-2xl font-bold text-center mb-6 text-black">Register</h2>
+    <div className="flex justify-center items-center h-screen bg-gradient-to-r from-blue-500 to-indigo-600">
+      <div className="bg-white p-8 rounded-lg shadow-xl max-w-sm w-full">
+        <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">Register</h2>
 
         {/* Success Message */}
         {successMessage && (
@@ -87,7 +84,7 @@ const RegisterPage = () => {
               type="email"
               id="email"
               name="email"
-              className="w-full px-4 py-2 mt-2 border bg-white rounded-md text-black"
+              className="w-full px-4 py-3 mt-2 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-400"
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -100,7 +97,7 @@ const RegisterPage = () => {
               type="text"
               id="username"
               name="username"
-              className="w-full px-4 py-2 mt-2 border bg-white rounded-md text-black"
+              className="w-full px-4 py-3 mt-2 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-400"
               placeholder="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -113,7 +110,7 @@ const RegisterPage = () => {
               type="password"
               id="password"
               name="password"
-              className="w-full px-4 py-2 mt-2 border bg-white rounded-md text-black"
+              className="w-full px-4 py-3 mt-2 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-400"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -126,7 +123,7 @@ const RegisterPage = () => {
               type="password"
               id="confirmPassword"
               name="confirmPassword"
-              className="w-full px-4 py-2 mt-2 border bg-white rounded-md text-black"
+              className="w-full px-4 py-3 mt-2 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-400"
               placeholder="Confirm Password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
@@ -138,7 +135,7 @@ const RegisterPage = () => {
             <select
               id="user_type"
               name="user_type"
-              className="w-full px-4 py-2 mt-2 border bg-white rounded-md text-black"
+              className="w-full px-4 py-3 mt-2 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-400"
               value={userType}
               onChange={(e) => setUserType(e.target.value)}
             >
@@ -152,7 +149,7 @@ const RegisterPage = () => {
               type="text"
               id="address"
               name="address"
-              className="w-full px-4 py-2 mt-2 border bg-white rounded-md text-black"
+              className="w-full px-4 py-3 mt-2 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-400"
               placeholder="Address"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
@@ -165,7 +162,7 @@ const RegisterPage = () => {
               type="text"
               id="district"
               name="district"
-              className="w-full px-4 py-2 mt-2 border bg-white rounded-md text-black"
+              className="w-full px-4 py-3 mt-2 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-400"
               placeholder="District"
               value={district}
               onChange={(e) => setDistrict(e.target.value)}
@@ -178,7 +175,7 @@ const RegisterPage = () => {
               type="text"
               id="contact_number"
               name="contact_number"
-              className="w-full px-4 py-2 mt-2 border bg-white rounded-md text-black"
+              className="w-full px-4 py-3 mt-2 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-400"
               placeholder="Contact Number"
               value={contactNumber}
               onChange={(e) => setContactNumber(e.target.value)}
@@ -188,7 +185,7 @@ const RegisterPage = () => {
 
           <button
             type="submit"
-            className="w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            className="w-full py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition duration-300"
           >
             Register
           </button>

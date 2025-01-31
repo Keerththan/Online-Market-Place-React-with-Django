@@ -1,5 +1,5 @@
-import { useNavigate } from "react-router-dom"; // Importing useNavigate
-import { useState, useEffect } from "react"; 
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const SellerDashboard = () => {
@@ -71,23 +71,41 @@ const SellerDashboard = () => {
             </button>
           </li>
           <li>
-            <button onClick={() => navigate("/login")} className="w-full px-4 py-2 bg-red-500 hover:bg-red-400 rounded-md transition">
-              🚪 Logout
-            </button>
+          <button
+  onClick={() => {
+    // Clear user data from localStorage
+    localStorage.removeItem("user");
+    localStorage.removeItem("access_token");
+
+    // Optionally reset user state (if you are using state for user data)
+    // setUser(null); // Unset user state
+
+    // Redirect to the login page after logout
+    navigate("/login");
+  }}
+  className="w-full px-4 py-2 bg-red-500 hover:bg-red-400 rounded-md transition"
+>
+  🚪 Logout
+</button>
           </li>
         </ul>
-
-        {/* Display seller details */}
-        {sellerDetails && (
-          <div className="mt-6 bg-gray-700 p-4 rounded-lg text-sm text-gray-200">
-            <h4 className="font-bold text-lg">Seller Details:</h4>
-            <p><strong>Name:</strong> {sellerDetails.username}</p>
-            <p><strong>Email:</strong> {sellerDetails.email}</p>
-            <p><strong>Contact:</strong> {sellerDetails.contact_number}</p>
-            <p><strong>Address:</strong> {sellerDetails.address}</p>
-          </div>
-        )}
+        {/* Seller Details Section */}
+       <div className="mt-6 p-4 bg-gray-700 rounded-md text-sm">
+          <h3 className="text-lg font-semibold">Seller Details</h3>
+          {sellerDetails.username && (
+            <div>
+              <p className="mt-2">Username: {sellerDetails.username}</p>
+              <p>Email: {sellerDetails.email}</p>
+              <p>Contact: {sellerDetails.contact_number}</p>
+              <p>Address: {sellerDetails.address}</p>
+            </div>
+          )}
+        </div>
       </div>
+
+
+       
+      
 
       {/* Main Content */}
       <div className="w-3/4 p-8">
@@ -142,3 +160,135 @@ const SellerDashboard = () => {
 };
 
 export default SellerDashboard;
+
+
+/**
+ * AddProductModal Component - Modernized Modal UI
+ */
+const AddProductModal = ({ isOpen, onClose, onProductAddedOrUpdated, sellerId, editProduct }) => {
+  const [productData, setProductData] = useState({
+    product_name: editProduct?.product_name || "",
+    product_net_weight: editProduct?.product_net_weight || "",
+    product_category: editProduct?.product_category || "",
+    product_price: editProduct?.product_price || "",
+    product_image: null,
+  });
+
+  useEffect(() => {
+    if (editProduct) {
+      setProductData({
+        product_name: editProduct.product_name,
+        product_net_weight: editProduct.product_net_weight,
+        product_category: editProduct.product_category,
+        product_price: editProduct.product_price,
+        product_image: null,
+      });
+    }
+  }, [editProduct]);
+
+  const handleChange = (e) => {
+    setProductData({ ...productData, [e.target.name]: e.target.value });
+  };
+
+  const handleImageChange = (e) => {
+    setProductData({ ...productData, product_image: e.target.files[0] });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append("product_name", productData.product_name);
+    formData.append("product_net_weight", productData.product_net_weight);
+    formData.append("product_category", productData.product_category);
+    formData.append("product_price", productData.product_price);
+    formData.append("seller_id", sellerId);
+    if (productData.product_image) {
+      formData.append("product_image", productData.product_image);
+    }
+
+    try {
+      if (editProduct) {
+        await axios.patch(`http://127.0.0.1:8000/inventory/products/${editProduct.id}/`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+      } else {
+        await axios.post("http://127.0.0.1:8000/inventory/products/", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+      }
+
+      onProductAddedOrUpdated();
+      onClose();
+    } catch (error) {
+      console.error("Error adding/updating product:", error);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-96">
+        <h2 className="text-2xl font-semibold text-center mb-4">{editProduct ? "Update Product" : "Add Product"}</h2>
+        <form onSubmit={handleSubmit}>
+          <input 
+            type="text" 
+            name="product_name" 
+            value={productData.product_name} 
+            placeholder="Product Name" 
+            className="w-full mb-4 p-3 border border-gray-300 rounded-md" 
+            onChange={handleChange} 
+            required 
+          />
+          <input 
+            type="number" 
+            name="product_net_weight" 
+            value={productData.product_net_weight} 
+            placeholder="Net Weight (grams)" 
+            className="w-full mb-4 p-3 border border-gray-300 rounded-md" 
+            onChange={handleChange} 
+            required 
+          />
+          <input 
+            type="text" 
+            name="product_category" 
+            value={productData.product_category} 
+            placeholder="Category" 
+            className="w-full mb-4 p-3 border border-gray-300 rounded-md" 
+            onChange={handleChange} 
+            required 
+          />
+          <input 
+            type="number" 
+            name="product_price" 
+            value={productData.product_price} 
+            placeholder="Price ($)" 
+            className="w-full mb-4 p-3 border border-gray-300 rounded-md" 
+            onChange={handleChange} 
+            required 
+          />
+          <input 
+            type="file" 
+            name="product_image" 
+            className="w-full mb-4 p-3 border border-gray-300 rounded-md" 
+            onChange={handleImageChange} 
+          />
+
+          <div className="flex justify-between mt-4">
+            <button 
+              type="button" 
+              className="px-4 py-2 bg-gray-400 text-white rounded-md hover:bg-gray-500" 
+              onClick={onClose}
+            >
+              Cancel
+            </button>
+            <button 
+              type="submit" 
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+            >
+              {editProduct ? "Update Product" : "Add Product"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};

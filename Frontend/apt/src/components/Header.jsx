@@ -1,5 +1,5 @@
-import { useNavigate, useLocation } from "react-router-dom"; // Import useLocation to get the current path
-import { useState, useEffect } from "react"; // Only import useEffect and useState
+import { useNavigate, useLocation, Link } from "react-router-dom"; // Import Link for routing
+import { useState, useEffect } from "react";
 import { FaUser } from "react-icons/fa"; // Importing FontAwesome user icon
 
 const Header = () => {
@@ -12,15 +12,17 @@ const Header = () => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       setUser(JSON.parse(storedUser)); // Set user data if logged in
+    } else {
+      setUser(null); // Reset user if no data found
     }
-  }, [location.pathname]); // Add location.pathname as a dependency
+  }, [location.pathname]); // Run whenever the pathname changes
 
   // Handle logout
   const handleLogout = () => {
     localStorage.removeItem("user"); // Clear user data
     localStorage.removeItem("access_token"); // Remove JWT token if stored
     setUser(null); // Reset user state
-    navigate("/"); // Redirect to home page
+    navigate("/login"); // Redirect to login page after logout
   };
 
   return (
@@ -35,24 +37,24 @@ const Header = () => {
         <nav>
           <ul className="hidden md:flex space-x-8 text-lg font-medium">
             <li>
-              <a href="#home" className="hover:text-blue-400 transition duration-300">
+              <Link to="/" className="hover:text-blue-400 transition duration-300">
                 Home
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#products" className="hover:text-blue-400 transition duration-300">
+              <Link to="#products" className="hover:text-blue-400 transition duration-300">
                 Products
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#faqs" className="hover:text-blue-400 transition duration-300">
+              <Link to="#faqs" className="hover:text-blue-400 transition duration-300">
                 FAQs
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#contact" className="hover:text-blue-400 transition duration-300">
+              <Link to="#contact" className="hover:text-blue-400 transition duration-300">
                 Contact
-              </a>
+              </Link>
             </li>
           </ul>
         </nav>
