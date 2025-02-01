@@ -67,7 +67,8 @@ WSGI_APPLICATION = 'BillingSystem.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'django_rest_framework',
+        # 'NAME': 'django_rest_framework',
+        'NAME': 'new',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',

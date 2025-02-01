@@ -28,6 +28,7 @@ const ProductDetailPage = () => {
       const orderDetails = {
         buyer_id: buyer_id,
         product_id: product.id,
+        seller_id:product.seller_id,
         quantity: quantity,
         total_price: product.product_price * quantity,
         product_name: product.product_name,  // Passing additional details

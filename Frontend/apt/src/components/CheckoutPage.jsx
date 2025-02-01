@@ -18,6 +18,7 @@ const CheckoutPage = () => {
     const orderData = {
       buyer_id: orderDetails.buyer_id,
       product_id: orderDetails.product_id,
+      seller_id: orderDetails.seller_id,
       quantity: orderDetails.quantity,
       price: orderDetails.total_price,
       address: address,
@@ -25,6 +26,7 @@ const CheckoutPage = () => {
       payment_method: paymentMethod,
       product_name:orderDetails.product_name
     };
+    console.log(orderData);
 
     try {
       const response = await axios.post('http://127.0.0.1:8000/inventory/orders/create/', orderData);
@@ -35,7 +37,7 @@ const CheckoutPage = () => {
       console.error("Error creating order:", error);
     }
   };
-
+  
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">

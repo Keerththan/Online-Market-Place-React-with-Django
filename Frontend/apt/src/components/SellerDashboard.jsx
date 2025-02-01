@@ -5,9 +5,11 @@ import axios from "axios";
 const SellerDashboard = () => {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [sellerDetails, setSellerDetails] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editProduct, setEditProduct] = useState(null);
+  const [activeTab, setActiveTab] = useState("products"); // State to toggle between "products" and "orders"
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -25,6 +27,13 @@ const SellerDashboard = () => {
         .catch((error) => console.error("Error fetching products", error));
     }
   }, [sellerDetails.id]);
+
+  const fetchOrders = () => {
+    axios
+      .get(`http://127.0.0.1:8000/inventory/orders/seller/${sellerDetails.id}/`)
+      .then((response) => setOrders(response.data.orders))
+      .catch((error) => console.error("Error fetching orders", error));
+  };
 
   const handleProductAddedOrUpdated = () => {
     if (sellerDetails.id) {
@@ -54,6 +63,19 @@ const SellerDashboard = () => {
     setIsModalOpen(true);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("access_token");
+    navigate("/login");
+  };
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    if (tab === "orders") {
+      fetchOrders(); // Fetch orders when tab is changed to "orders"
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
@@ -61,36 +83,30 @@ const SellerDashboard = () => {
         <h2 className="text-3xl font-bold text-center text-blue-500">Seller Panel</h2>
         <ul className="mt-6 space-y-4">
           <li>
-            <button className="w-full text-left px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-md transition">
+            <button
+              onClick={() => handleTabChange("products")}
+              className="w-full text-left px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-md transition"
+            >
               📦 Products
             </button>
           </li>
           <li>
-            <button className="w-full text-left px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-md transition">
+            <button
+              onClick={() => handleTabChange("orders")}
+              className="w-full text-left px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-md transition"
+            >
               📑 Orders
             </button>
           </li>
           <li>
-          <button
-  onClick={() => {
-    // Clear user data from localStorage
-    localStorage.removeItem("user");
-    localStorage.removeItem("access_token");
-
-    // Optionally reset user state (if you are using state for user data)
-    // setUser(null); // Unset user state
-
-    // Redirect to the login page after logout
-    navigate("/login");
-  }}
-  className="w-full px-4 py-2 bg-red-500 hover:bg-red-400 rounded-md transition"
->
-  🚪 Logout
-</button>
+            <button onClick={handleLogout} className="w-full px-4 py-2 bg-red-500 hover:bg-red-400 rounded-md transition">
+              🚪 Logout
+            </button>
           </li>
         </ul>
+
         {/* Seller Details Section */}
-       <div className="mt-6 p-4 bg-gray-700 rounded-md text-sm">
+        <div className="mt-6 p-4 bg-gray-700 rounded-md text-sm">
           <h3 className="text-lg font-semibold">Seller Details</h3>
           {sellerDetails.username && (
             <div>
@@ -103,54 +119,77 @@ const SellerDashboard = () => {
         </div>
       </div>
 
-
-       
-      
-
       {/* Main Content */}
       <div className="w-3/4 p-8">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-semibold text-gray-800">📋 Products</h2>
-          <button 
-            onClick={() => { setEditProduct(null); setIsModalOpen(true); }} 
-            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
-            ➕ Add Product
-          </button>
-        </div>
-
-        {/* Product Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {products.length > 0 ? (
-            products.map((product) => (
-              <div key={product.id} className="bg-white shadow-lg rounded-lg p-6 border border-gray-300 hover:shadow-xl transition duration-300">
-                <h3 className="text-lg font-semibold text-gray-900">{product.product_name}</h3>
-                <p className="text-gray-600 text-sm">${product.product_price}</p>
-                <div className="flex justify-between mt-4">
-                  <button 
-                    onClick={() => handleEditProduct(product)} 
-                    className="text-yellow-500 hover:text-yellow-600 transition">
-                    ✏️ Edit
-                  </button>
-                  <button 
-                    onClick={() => handleDeleteProduct(product.id)} 
-                    className="text-red-500 hover:text-red-600 transition">
-                    🗑️ Delete
-                  </button>
-                </div>
-              </div>
-            ))
-          ) : (
-            <p className="text-gray-600">No products available</p>
+          <h2 className="text-3xl font-semibold text-gray-800">{activeTab === "products" ? "📋 Products" : "📋 Orders"}</h2>
+          {activeTab === "products" && (
+            <button
+              onClick={() => {
+                setEditProduct(null);
+                setIsModalOpen(true);
+              }}
+              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+            >
+              ➕ Add Product
+            </button>
           )}
         </div>
+
+        {/* Conditional Rendering based on activeTab */}
+        {activeTab === "products" && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {products.length > 0 ? (
+              products.map((product) => (
+                <div key={product.id} className="bg-white shadow-lg rounded-lg p-6 border border-gray-300 hover:shadow-xl transition duration-300">
+                  <h3 className="text-lg font-semibold text-gray-900">{product.product_name}</h3>
+                  <p className="text-gray-600 text-sm">${product.product_price}</p>
+                  <div className="flex justify-between mt-4">
+                    <button onClick={() => handleEditProduct(product)} className="text-yellow-500 hover:text-yellow-600 transition">
+                      ✏️ Edit
+                    </button>
+                    <button onClick={() => handleDeleteProduct(product.id)} className="text-red-500 hover:text-red-600 transition">
+                      🗑️ Delete
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-600">No products available</p>
+            )}
+          </div>
+        )}
+
+        {activeTab === "orders" && (
+          <div className="mt-8">
+            <h3 className="text-2xl font-semibold text-gray-800 mb-4">Orders</h3>
+            {orders.length > 0 ? (
+              <div>
+                {orders.map((order) => (
+                  <div key={order.order_id} className="p-4 mb-4 border rounded-md shadow-md bg-white">
+                    <p><strong>Order ID:</strong> {order.order_id}</p>
+                    <p><strong>Product Name:</strong> {order.product_name}</p>
+                    <p><strong>Buyer id:</strong> {order.buyer_id}</p>
+                    <p><strong>Quantity:</strong> {order.quantity}</p>
+                    <p><strong>Price:</strong> ${order.price}</p>
+                    <p><strong>Status:</strong> {order.status}</p>
+                    <p><strong>Payment Method:</strong> {order.payment_method}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p>No orders found</p>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Add/Edit Product Modal */}
       {isModalOpen && (
-        <AddProductModal 
-          isOpen={isModalOpen} 
-          onClose={() => setIsModalOpen(false)} 
-          onProductAddedOrUpdated={handleProductAddedOrUpdated} 
+        <AddProductModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onProductAddedOrUpdated={handleProductAddedOrUpdated}
           sellerId={sellerDetails.id}
           editProduct={editProduct}
         />
@@ -160,6 +199,8 @@ const SellerDashboard = () => {
 };
 
 export default SellerDashboard;
+
+
 
 
 /**

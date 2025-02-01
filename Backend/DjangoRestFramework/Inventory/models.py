@@ -52,7 +52,9 @@ class Order(models.Model):
     )
 
     buyer_id = models.IntegerField(help_text="ID of the buyer")
+    seller_id = models.IntegerField(help_text="ID of the seller")  # New field added
     product_id = models.IntegerField(help_text="ID of the product being ordered")
+    product_name = models.CharField(max_length=200, help_text="Name of the product being ordered")  # New field added
     quantity = models.IntegerField(default=1, help_text="Quantity of the product being ordered")
     price = models.FloatField(default=0, help_text="Price of the product at the time of purchase")
     address = models.TextField(help_text="Delivery address for the order")
@@ -67,8 +69,10 @@ class Order(models.Model):
     )
 
     def __str__(self):
-        return f"Order #{self.id} by Buyer {self.buyer_id} for Product {self.product_id}"
+        return f"Order #{self.id} by Buyer {self.buyer_id} for Product {self.product_name} (Seller ID: {self.seller_id})"
 
     def get_total_price(self):
         """Calculate the total price for the order (quantity * price)."""
         return self.quantity * self.price
+
+

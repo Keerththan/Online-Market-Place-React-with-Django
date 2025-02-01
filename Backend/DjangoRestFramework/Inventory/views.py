@@ -26,6 +26,7 @@ class ProductsView(APIView):
                 "product_net_weight": product.product_net_weight,
                 "product_category": product.product_category,
                 "product_price": product.product_price,
+                "seller_id": product.seller_id,  # Added seller_id here
             }
             products_data.append(single_product)
 
@@ -57,6 +58,7 @@ class ProductsViewById(APIView):
                 "product_net_weight": product.product_net_weight,
                 "product_category": product.product_category,
                 "product_price": product.product_price,
+                "seller_id": product.seller_id,  # Added seller_id here
             }
             return Response(single_product)
         except Products.DoesNotExist:
@@ -66,11 +68,13 @@ class ProductsViewById(APIView):
         try:
             product = Products.objects.get(id=id)
 
+            # Updating the fields, including seller_id if provided
             product.product_image = request.FILES.get("product_image", product.product_image)
             product.product_name = request.data.get("product_name", product.product_name)
             product.product_net_weight = request.data.get("product_net_weight", product.product_net_weight)
             product.product_category = request.data.get("product_category", product.product_category)
             product.product_price = request.data.get("product_price", product.product_price)
+            product.seller_id = request.data.get("seller_id", product.seller_id)  # Updating seller_id
 
             product.save()
             return Response("Updated")
@@ -161,6 +165,7 @@ class GetProductsBySellerId(APIView):
                     "product_net_weight": product.product_net_weight,
                     "product_category": product.product_category,
                     "product_price": product.product_price,
+                    "seller_id": product.seller_id,  # Added seller_id here
                 }
                 products_data.append(single_product)
 
@@ -176,6 +181,8 @@ def create_order(request):
 
         buyer_id = data.get('buyer_id')
         product_id = data.get('product_id')
+        product_name = data.get('product_name')
+        seller_id = data.get('seller_id')
         quantity = data.get('quantity', 1)
         price = data.get('price')
         address = data.get('address')
@@ -191,11 +198,13 @@ def create_order(request):
         order = Order.objects.create(
             buyer_id=buyer_id,
             product_id=product_id,
+            product_name=product_name,
             quantity=quantity,
             price=price,
             address=address,
             mobile_number=mobile_number,
-            payment_method=payment_method
+            payment_method=payment_method,
+            seller_id=seller_id,
         )
 
         return JsonResponse({'message': 'Order placed successfully', 'order_id': order.id}, status=201)
@@ -217,6 +226,7 @@ def get_orders_by_seller(request, seller_id):
                     'order_id': order.id,
                     'buyer_id': order.buyer_id,
                     'product_id': order.product_id,
+                    'product_name': order.product_name,
                     'quantity': order.quantity,
                     'price': order.price,
                     'address': order.address,
