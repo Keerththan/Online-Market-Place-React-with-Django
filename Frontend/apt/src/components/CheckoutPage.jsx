@@ -23,13 +23,14 @@ const CheckoutPage = () => {
       address: address,
       mobile_number: phoneNumber,
       payment_method: paymentMethod,
+      product_name:orderDetails.product_name
     };
 
     try {
       const response = await axios.post('http://127.0.0.1:8000/inventory/orders/create/', orderData);
       console.log(response.data);
       // Navigate to an order confirmation page after successful submission
-      navigate("/order-confirmation", { state: orderDetails });
+      navigate("/order-confirmation", { state: orderData });
     } catch (error) {
       console.error("Error creating order:", error);
     }

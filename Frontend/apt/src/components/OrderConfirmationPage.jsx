@@ -26,8 +26,8 @@ const OrderConfirmationPage = () => {
         <div className="mt-6 p-6 border rounded-lg bg-gray-50">
           <h3 className="text-lg font-semibold text-gray-700">Order Summary</h3>
           <div className="mt-4 text-left">
-            <p><strong>Order ID:</strong> {orderDetails.order_id}</p>
-            <p><strong>Buyer:</strong> {orderDetails.buyer_name}</p>
+            
+
             <p><strong>Product:</strong> {orderDetails.product_name}</p>
             <p><strong>Quantity:</strong> {orderDetails.quantity}</p>
             <p><strong>Total Price:</strong> ${orderDetails.total_price}</p>
