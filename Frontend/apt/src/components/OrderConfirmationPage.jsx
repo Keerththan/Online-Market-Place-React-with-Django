@@ -30,7 +30,7 @@ const OrderConfirmationPage = () => {
 
             <p><strong>Product:</strong> {orderDetails.product_name}</p>
             <p><strong>Quantity:</strong> {orderDetails.quantity}</p>
-            <p><strong>Total Price:</strong> ${orderDetails.total_price}</p>
+            <p><strong>Total Price:</strong> ${orderDetails.price}</p>
             <p><strong>Delivery Address:</strong> {orderDetails.address}</p>
             <p><strong>Phone:</strong> {orderDetails.mobile_number}</p>
             <p><strong>Payment Method:</strong> {orderDetails.payment_method}</p>
